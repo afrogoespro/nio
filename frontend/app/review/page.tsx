@@ -183,7 +183,7 @@ export default function ReviewPage() {
                     display: "block", width: "100%", padding: "14px 16px", textAlign: "left",
                     background: isActive ? "#1a1a1a" : "transparent",
                     color: isActive ? "#f5f0e8" : s?.status !== "pending" ? "#bbb" : "#1a1a1a",
-                    borderBottom: "1px solid #ddd", fontFamily: "inherit", fontSize: "13px",
+                    fontFamily: "inherit", fontSize: "13px",
                     cursor: "pointer", border: "none", borderBottom: "1px solid " + (isActive ? "#333" : "#ddd"),
                   }}
                 >
