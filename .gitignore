@@ -1,0 +1,33 @@
+# env files - never commit these
+.env
+.env.local
+.env.production
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# node
+node_modules/
+.next/
+out/
+
+# system
+.DS_Store
+*.log
+
+# local dev / mcp / runtime
+.claude/
+.superpowers/brainstorm/*/.server*
+.superpowers/brainstorm/*/.server.pid
+.superpowers/brainstorm/*/waiting*.html
+
+# IDE
+.vscode/
+.idea/
