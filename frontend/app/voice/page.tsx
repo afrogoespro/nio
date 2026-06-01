@@ -160,11 +160,11 @@ export default function VoicePage() {
           <p style={{ fontSize: "13px", marginBottom: "6px" }}>
             energy: {voiceProfile.energy as string} &nbsp;&middot;&nbsp; tone: {voiceProfile.formality as string}
           </p>
-          {voiceProfile.example_opener && (
+          {(voiceProfile.example_opener && (
             <p style={{ fontSize: "13px", marginTop: "10px", borderTop: "1px solid #333", paddingTop: "10px", color: "#ccc", fontStyle: "italic" }}>
               example opener: "{voiceProfile.example_opener as string}"
             </p>
-          )}
+          )) as React.ReactNode}
         </div>
       )}
 
