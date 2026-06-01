@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIO — App Flow Mockup v2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f4f9f0;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SCREEN CONTAINER ── */
+  .screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px 80px;
+    border-bottom: 2px dashed #d6dfce;
+    position: relative;
+  }
+  .screen-label {
+    position: absolute;
+    top: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #a8d5a2;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── SHARED ── */
+  .container { max-width: 860px; width: 100%; }
+  h1 { font-size: 32px; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
+  .sub { font-size: 15px; color: #666; margin-bottom: 32px; }
+  .btn {
+    padding: 12px 28px; border-radius: 24px; font-size: 14px;
+    font-weight: 600; border: none; cursor: pointer;
+    font-family: inherit; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-dark { background: #1a1a1a; color: #f4f9f0; }
+  .btn-dark:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15); transform: translateY(-1px); }
+  .btn-green { background: #a8d5a2; color: #1a1a1a; }
+  .btn-green:hover { background: #96c88f; }
+  .btn-outline { background: transparent; border: 1.5px solid #ccc; color: #666; }
+  .btn-outline:hover { border-color: #1a1a1a; color: #1a1a1a; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 1: AGENT SELECTION
+     ═══════════════════════════════════════ */
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .agent-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    border: 2.5px solid transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .agent-card:hover {
+    border-color: #a8d5a2;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+  }
+  .agent-card.selected {
+    border-color: #a8d5a2;
+    background: #f9fdf7;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .agent-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 12px; right: 14px;
+    background: #a8d5a2;
+    color: #1a1a1a;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .agent-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    overflow: hidden;
+    background: #eee;
+    position: relative;
+  }
+  .agent-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .agent-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+  .agent-card .agent-age { font-size: 12px; color: #999; margin-bottom: 8px; }
+  .agent-card .agent-desc { font-size: 12px; color: #666; line-height: 1.4; }
+  .agent-card .agent-vibe {
+    display: inline-block; margin-top: 10px;
+    background: #eef6e9; padding: 4px 12px; border-radius: 10px;
+    font-size: 11px; color: #5a8a52; font-weight: 500;
+  }
+
+  /* build your own */
+  .agent-custom-row {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .agent-card.custom {
+    border: 2.5px dashed #ccc;
+    background: #fafcf8;
+  }
+  .agent-card.custom:hover { border-color: #a8d5a2; border-style: dashed; }
+
+  .agent-continue {
+    text-align: center;
+    margin-top: 28px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .agent-continue.visible { opacity: 1; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 2: VOICE CONVERSATION
+     ═══════════════════════════════════════ */
+  .chat-container {
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    max-width: 560px;
+    width: 100%;
+  }
+  .chat-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  .chat-avatar-sm {
+    width: 40px; height: 40px; border-radius: 50%;
+    overflow: hidden; background: #eee;
+  }
+  .chat-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+  .chat-name { font-weight: 600; font-size: 15px; }
+  .chat-status { font-size: 12px; color: #a8d5a2; }
+  .chat-messages { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+  .msg {
+    max-width: 85%; padding: 14px 18px;
+    border-radius: 18px; font-size: 14px; line-height: 1.5;
+  }
+  .msg-agent {
+    background: #f4f9f0; align-self: flex-start;
+    border-bottom-left-radius: 6px;
+  }
+  .msg-user {
+    background: #1a1a1a; color: #f4f9f0; align-self: flex-end;
+    border-bottom-right-radius: 6px;
+  }
+  .chat-input-area {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .chat-text-input {
+    flex: 1; padding: 12px 18px; border-radius: 24px;
+    border: 1.5px solid #ddd; font-family: inherit; font-size: 14px;
+    background: #fafcf8; outline: none;
+  }
+  .chat-text-input:focus { border-color: #a8d5a2; }
+  .mic-btn {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #a8d5a2; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .mic-btn:hover { background: #96c88f; transform: scale(1.05); }
+
+  /* ═══════════════════════════════════════
+     SCREEN 3: THE PLAN
+     ═══════════════════════════════════════ */
+  .plan-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    margin-bottom: 16px;
+  }
+  .plan-card h3 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: #999; margin-bottom: 12px;
+  }
+  .plan-card .editable {
+    background: #fafcf8; border: 1px dashed #ccc;
+    border-radius: 12px; padding: 12px 16px; margin-top: 8px;
+    font-size: 14px; color: #444; cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .plan-card .editable:hover { border-color: #a8d5a2; }
+  .plan-card .edit-hint { font-size: 11px; color: #bbb; margin-top: 6px; }
+  .icp-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .icp-tag {
+    background: #eef6e9; padding: 6px 14px; border-radius: 12px;
+    font-size: 12px; color: #4a7a42; font-weight: 500;
+  }
+  .icp-tag.tan { background: #f0ebe0; color: #8a7550; }
+  .icp-tag.purple { background: #ede8f4; color: #6b5b8a; }
+  .knob-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+  .knob { background: #fafcf8; border-radius: 12px; padding: 14px 16px; }
+  .knob-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+  .knob-track { height: 6px; background: #e8e8e8; border-radius: 3px; }
+  .knob-fill { height: 100%; background: #a8d5a2; border-radius: 3px; }
+  .knob-value { font-size: 20px; font-weight: 700; margin-top: 6px; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 4: EMAIL PREVIEW
+     ═══════════════════════════════════════ */
+  .preview-emails { display: flex; flex-direction: column; gap: 16px; }
+  .email-preview {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .email-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee;
+  }
+  .email-to { font-weight: 600; font-size: 14px; }
+  .email-company { font-size: 12px; color: #999; }
+  .email-trigger {
+    display: inline-block;
+    background: #ede8f4; padding: 4px 12px; border-radius: 10px;
+    font-size: 11px; color: #6b5b8a; font-weight: 500;
+  }
+  .email-subject { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+  .email-body {
+    font-size: 14px; color: #555; line-height: 1.7;
+    padding: 16px; background: #fafcf8; border-radius: 12px; border: 1px solid #eee;
+  }
+  .email-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 5: DASHBOARD
+     ═══════════════════════════════════════ */
+  .dash-agent-status {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 24px;
+  }
+  .dash-agent-thumb {
+    width: 44px; height: 44px; border-radius: 50%;
+    overflow: hidden; background: #eee;
+  }
+  .dash-agent-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .dash-agent-info { flex: 1; }
+  .dash-agent-name { font-weight: 600; font-size: 14px; }
+  .dash-agent-doing { font-size: 13px; color: #888; }
+  .pulse {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #a8d5a2;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+  .dash-stats {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px; margin-bottom: 24px;
+  }
+  .stat-card {
+    background: #fff; border-radius: 16px; padding: 24px 20px;
+    text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .stat-num { font-size: 36px; font-weight: 700; }
+  .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+  .stat-card.highlight { background: #a8d5a2; }
+  .stat-card.highlight .stat-label { color: #3a6a34; }
+  .dash-actions {
+    display: flex; gap: 12px; margin-bottom: 24px; justify-content: center;
+  }
+  .dash-notification {
+    background: #fff; border-radius: 16px; padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 12px;
+  }
+  .notif-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #a8d5a2; margin-right: 12px; flex-shrink: 0;
+  }
+  .notif-text { font-size: 14px; flex: 1; }
+  .notif-time { font-size: 12px; color: #999; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 780px) {
+    .agents-grid { grid-template-columns: repeat(2, 1fr); }
+    .dash-stats { grid-template-columns: 1fr; }
+    .knob-row { grid-template-columns: 1fr; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 1: CHOOSE YOUR AGENT
+     ═══════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 1 — Choose Your Agent</div>
+  <div class="container" style="text-align: center;">
+    <h1>Who do you want working for you?</h1>
+    <p class="sub">Pick an agent that matches your style. They handle outreach, research, follow-ups — whatever you need.</p>
+
+    <div class="agents-grid">
+      <div class="agent-card" onclick="selectAgent(this)">
+        <div class="agent-avatar">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&h=160&fit=crop&crop=face" alt="Sally" />
+        </div>
+        <h3>Sally</h3>
+        <p class="agent-age">25 · Marketing Creative</p>
+        <p class="agent-desc">Casual, energetic, and fresh. Great for startups and creative industries.</p>
+        <span class="agent-vibe">casual & energetic</span>
+      </div>
+
+      <div class="agent-card" onclick="selectAgent(this)">
+        <div class="agent-avatar">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&fit=crop&crop=face" alt="David" />
+        </div>
+        <h3>David</h3>
+        <p class="agent-age">35 · SDR Veteran</p>
+        <p class="agent-desc">Polished, professional, strategic. Built for B2B and enterprise outreach.</p>
+        <span class="agent-vibe">corporate & polished</span>
+      </div>
+
+      <div class="agent-card" onclick="selectAgent(this)">
+        <div class="agent-avatar">
+          <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=160&h=160&fit=crop&crop=face" alt="Jessica" />
+        </div>
+        <h3>Jessica</h3>
+        <p class="agent-age">47 · Communications Expert</p>
+        <p class="agent-desc">Direct, real, efficient. Gets to the point and gets stuff done. No fluff.</p>
+        <span class="agent-vibe">direct & no-nonsense</span>
+      </div>
+
+      <div class="agent-card" onclick="selectAgent(this)">
+        <div class="agent-avatar">
+          <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=160&h=160&fit=crop&crop=face" alt="Hans" />
+        </div>
+        <h3>Hans</h3>
+        <p class="agent-age">Friendly Realist</p>
+        <p class="agent-desc">Talks like a friend. Warm, honest, real. Cold outreach that feels genuine.</p>
+        <span class="agent-vibe">friendly & real</span>
+      </div>
+    </div>
+
+    <div class="agent-custom-row">
+      <div class="agent-card custom" onclick="selectAgent(this)">
+        <div class="agent-avatar" style="background: #eef6e9; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 32px; color: #a8d5a2;">+</span>
+        </div>
+        <h3>Build Your Own</h3>
+        <p class="agent-age">Custom Agent</p>
+        <p class="agent-desc">Train an agent on your voice, your style, your personality. Make a copy of yourself.</p>
+        <span class="agent-vibe">your voice, your rules</span>
+      </div>
+    </div>
+
+    <div class="agent-continue" id="agentContinue">
+      <button class="btn btn-dark" style="font-size: 16px; padding: 14px 36px;">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 2: VOICE CONVERSATION
+     ═══════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 2 — Voice Setup</div>
+  <div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <h1 style="margin-bottom: 4px;">Talk to Sally</h1>
+    <p class="sub">Tell her about your business. She'll figure out the rest.</p>
+
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="chat-avatar-sm">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face" alt="Sally" />
+        </div>
+        <div>
+          <div class="chat-name">Sally</div>
+          <div class="chat-status">● listening</div>
+        </div>
+      </div>
+
+      <div class="chat-messages">
+        <div class="msg msg-agent">Hey! I'm Sally. Tell me about your business — what do you do, and who are you trying to reach? Just talk naturally, I'll ask follow-ups 😊</div>
+        <div class="msg msg-user">I run a design agency. We mostly do branding and web design for tech startups, usually Series A or B companies that just raised funding and need to look legit.</div>
+        <div class="msg msg-agent">Love that. So you're going after funded startups that need to level up their brand. Are you usually reaching out to the founders directly, or more like the head of marketing?</div>
+        <div class="msg msg-user">Usually founders or head of product. Marketing hires come later for those companies.</div>
+        <div class="msg msg-agent">Got it — founders and product leads at post-seed startups. And what's the goal here — booking intro calls, getting them to check out your portfolio, something else?</div>
+      </div>
+
+      <div class="chat-input-area">
+        <input class="chat-text-input" placeholder="Type or tap the mic to talk..." />
+        <button class="mic-btn">🎤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 3: YOUR PLAN
+     ═══════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 3 — Your Plan</div>
+  <div class="container" style="max-width: 640px;">
+    <h1>Here's what Sally put together.</h1>
+    <p class="sub">Review your plan. Tap anything to edit it.</p>
+
+    <div class="plan-card">
+      <h3>Your Business</h3>
+      <div class="editable">Design agency specializing in branding and web design for tech startups (Series A/B) that need to establish a professional brand presence.</div>
+      <p class="edit-hint">tap to edit</p>
+    </div>
+
+    <div class="plan-card">
+      <h3>Ideal Customer</h3>
+      <div class="icp-tags">
+        <span class="icp-tag">Founders</span>
+        <span class="icp-tag">Head of Product</span>
+        <span class="icp-tag tan">Series A–B startups</span>
+        <span class="icp-tag tan">11–50 employees</span>
+        <span class="icp-tag purple">Tech / SaaS</span>
+        <span class="icp-tag purple">Recently funded</span>
+      </div>
+      <p class="edit-hint">tap any tag to edit</p>
+    </div>
+
+    <div class="plan-card">
+      <h3>The Plan</h3>
+      <p style="color: #666; margin-bottom: 12px;">Sally will find people matching your ideal customer, research them, and write personalized emails in a casual, creative tone.</p>
+      <div class="knob-row">
+        <div class="knob">
+          <div class="knob-label">Emails per day</div>
+          <div class="knob-track"><div class="knob-fill" style="width: 40%;"></div></div>
+          <div class="knob-value">12</div>
+        </div>
+        <div class="knob">
+          <div class="knob-label">Sending window</div>
+          <div class="knob-track"><div class="knob-fill" style="width: 33%;"></div></div>
+          <div class="knob-value">9am – 12pm</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <button class="btn btn-dark">Looks good — show me examples →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 4: EMAIL PREVIEW
+     ═══════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 4 — Preview Emails</div>
+  <div class="container" style="max-width: 640px;">
+    <h1>Here's what Sally would send.</h1>
+    <p class="sub">Edit anything that doesn't sound right. She learns from every change.</p>
+
+    <div class="preview-emails">
+      <div class="email-preview">
+        <div class="email-meta">
+          <div>
+            <div class="email-to">Alex Chen</div>
+            <div class="email-company">Co-founder · Stackline (Series A, 23 people)</div>
+          </div>
+          <span class="email-trigger">📝 recent blog post about rebrand</span>
+        </div>
+        <div class="email-subject">your rebrand post</div>
+        <div class="email-body">
+          Hey Alex —<br><br>
+          Read your piece on the Stackline rebrand. The bit about letting the product voice evolve with the customer stuck with me — most founders don't think about that until way later.<br><br>
+          We do branding for post-seed startups and just wrapped something similar for a fintech company at your stage. Happy to share what we learned if it's useful.<br><br>
+          Either way, cool to see a founder thinking about brand that early.<br><br>
+          — Sally
+        </div>
+        <div class="email-actions">
+          <button class="btn btn-outline" style="font-size: 12px; padding: 8px 18px;">✏️ Edit</button>
+          <button class="btn btn-green" style="font-size: 12px; padding: 8px 18px;">✓ Looks good</button>
+        </div>
+      </div>
+
+      <div class="email-preview">
+        <div class="email-meta">
+          <div>
+            <div class="email-to">Priya Sharma</div>
+            <div class="email-company">Head of Product · Lumen AI (Series B, 48 people)</div>
+          </div>
+          <span class="email-trigger">🚀 just announced new funding round</span>
+        </div>
+        <div class="email-subject">congrats on the round</div>
+        <div class="email-body">
+          Hey Priya —<br><br>
+          Congrats on the Series B! Saw the announcement this morning. Exciting stage — everything starts moving faster.<br><br>
+          Usually when teams hit this moment, brand is the thing that quietly falls behind while product and hiring speed up. We help startups at exactly this stage lock in their visual identity before it gets messy.<br><br>
+          Would it be worth a quick chat to see if that's on your radar?<br><br>
+          — Sally
+        </div>
+        <div class="email-actions">
+          <button class="btn btn-outline" style="font-size: 12px; padding: 8px 18px;">✏️ Edit</button>
+          <button class="btn btn-green" style="font-size: 12px; padding: 8px 18px;">✓ Looks good</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 32px;">
+      <button class="btn btn-dark" style="font-size: 16px; padding: 16px 40px;">Launch Sally →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 5: DASHBOARD
+     ═══════════════════════════════════════════════ -->
+<div class="screen" style="border-bottom: none;">
+  <div class="screen-label">Screen 5 — Dashboard</div>
+  <div class="container" style="max-width: 640px;">
+
+    <div class="dash-agent-status">
+      <div class="dash-agent-thumb">
+        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=88&h=88&fit=crop&crop=face" alt="Sally" />
+      </div>
+      <div class="dash-agent-info">
+        <div class="dash-agent-name">Sally is working</div>
+        <div class="dash-agent-doing">Researching prospects · sent 8 emails today</div>
+      </div>
+      <div class="pulse"></div>
+    </div>
+
+    <div class="dash-stats">
+      <div class="stat-card">
+        <div class="stat-num">8</div>
+        <div class="stat-label">sent today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">127</div>
+        <div class="stat-label">total sent</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-num">4</div>
+        <div class="stat-label">replies</div>
+      </div>
+    </div>
+
+    <div class="dash-actions">
+      <button class="btn btn-dark">Run now</button>
+      <button class="btn btn-outline">Pause Sally</button>
+      <button class="btn btn-outline">Review queue (3)</button>
+    </div>
+
+    <div class="dash-notification">
+      <span class="notif-dot"></span>
+      <span class="notif-text"><strong>Priya Sharma</strong> replied to your email</span>
+      <span class="notif-time">2h ago</span>
+    </div>
+    <div class="dash-notification">
+      <span class="notif-dot" style="background: #d4c5a9;"></span>
+      <span class="notif-text"><strong>3 messages</strong> ready for your review</span>
+      <span class="notif-time">4h ago</span>
+    </div>
+    <div class="dash-notification">
+      <span class="notif-dot" style="background: #ddd;"></span>
+      <span class="notif-text">Sally sent <strong>12 emails</strong> yesterday — 1 reply</span>
+      <span class="notif-time">1d ago</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectAgent(card) {
+  document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('agentContinue').classList.add('visible');
+}
+</script>
+
+</body>
+</html>

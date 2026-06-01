@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIO Design Spec</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f4f9f0; color: #1a1a1a; line-height: 1.7; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 120px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.8px; }
+  h2 { font-size: 22px; font-weight: 700; margin-top: 48px; margin-bottom: 16px; padding-top: 24px; border-top: 2px solid #d6dfce; letter-spacing: -0.5px; }
+  h3 { font-size: 16px; font-weight: 600; margin-top: 28px; margin-bottom: 8px; }
+  p, li { font-size: 14px; color: #444; }
+  p { margin-bottom: 12px; }
+  ul { margin-left: 20px; margin-bottom: 16px; }
+  li { margin-bottom: 6px; }
+  strong { color: #1a1a1a; }
+  code { background: #eef6e9; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: monospace; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-right: 6px; }
+  .badge-green { background: #eef6e9; color: #4a7a42; }
+  .badge-tan { background: #f0ebe0; color: #8a7550; }
+  .badge-purple { background: #ede8f4; color: #6b5b8a; }
+  .swatch-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 20px; }
+  .swatch { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; font-size: 9px; color: #fff; padding-bottom: 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+  .card { background: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .overview-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  hr { border: none; border-top: 1px solid #d6dfce; margin: 32px 0; }
+  .rule { background: #fff; border-radius: 12px; padding: 14px 18px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+  .rule-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 4px; }
+  .banned { background: #fef2f2; border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
+  .banned code { background: #fee2e2; color: #991b1b; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="overview-label">Design Spec</p>
+<h1>NIO — Landing Page, App Redesign & Copy Rules</h1>
+<p>NIO is an AI outreach tool. Users pick a personality-driven AI agent, have a voice/text conversation about their business, review a plan, preview sample emails, and launch. The agent finds prospects, researches them, writes personalized emails, and sends on autopilot.</p>
+
+<div class="card" style="margin-top: 20px;">
+  <p style="margin: 0; font-size: 13px; color: #666;"><strong style="color: #1a1a1a;">Target user:</strong> Solo founders, freelancers, agency owners, salespeople. Non-technical. Should feel like talking to a person, not configuring software.</p>
+</div>
+
+<!-- ════════════════════════════════════ -->
+<h2>1. Landing Page</h2>
+
+<h3>Design System</h3>
+<div class="swatch-row">
+  <div class="swatch" style="background: #f4f9f0; color: #666; text-shadow: none;">bg</div>
+  <div class="swatch" style="background: #a8d5a2;">green</div>
+  <div class="swatch" style="background: #1a1a1a;">text</div>
+  <div class="swatch" style="background: #d4c5a9;">tan</div>
+  <div class="swatch" style="background: #b8a9d4;">lavender</div>
+  <div class="swatch" style="background: #ffffff; color: #666; text-shadow: none; border: 1px solid #ddd;">surface</div>
+</div>
+<ul>
+  <li><strong>Font:</strong> DM Sans</li>
+  <li><strong>Buttons:</strong> Pill-style, 24-28px radius</li>
+  <li><strong>Cards:</strong> White, 16-20px radius, subtle shadow</li>
+  <li><strong>Feel:</strong> Web 2.0 / early Basecamp — friendly, rounded, approachable</li>
+</ul>
+
+<h3>Navbar</h3>
+<p>Floating dark pill navbar, centered, sticky. Logo "nio" left. Links: How it works, Features, FAQ. Green CTA: "Book a demo"</p>
+
+<h3>Hero</h3>
+<div class="card">
+  <p style="font-size: 24px; font-weight: 700; margin-bottom: 4px; color: #1a1a1a;">Outreach that sounds like you wrote it.</p>
+  <p style="font-size: 14px; color: #666;">NIO finds the right people, writes personalized emails in your voice, and sends them on autopilot. You just close the deals.</p>
+  <p style="margin: 0;"><span class="badge badge-green">Book a demo →</span> <span style="font-size: 11px; color: #999;">No credit card. 15-minute setup.</span></p>
+</div>
+
+<h3>How It Works</h3>
+<p>Three white cards, numbered 1-2-3:</p>
+<ol>
+  <li><strong>Tell us about your business</strong> — Answer a few questions. NIO figures out the rest.</li>
+  <li><strong>We find and write</strong> — NIO researches real people and writes a personal email in your voice.</li>
+  <li><strong>You review, we send</strong> — Approve the ones you like. NIO learns from every change.</li>
+</ol>
+
+<h3>Features</h3>
+<p>Three tinted cards:</p>
+<ul>
+  <li><span class="badge badge-green">Learns your voice</span> Trains on how you talk. Every edit teaches it more.</li>
+  <li><span class="badge badge-tan">Real research, not templates</span> References something real about each person.</li>
+  <li><span class="badge badge-purple">Runs while you sleep</span> Finds prospects daily, pings you when someone replies.</li>
+</ul>
+
+<h3>FAQ</h3>
+<ul>
+  <li><strong>Will this spam people?</strong> — No. Unique, personalized, capped at ~30/day.</li>
+  <li><strong>Does it sound like a robot?</strong> — Learns your style through a training chat.</li>
+  <li><strong>What do I need?</strong> — A description of your business and 15 minutes.</li>
+  <li><strong>How do replies work?</strong> — You get an email notification, you take it from there.</li>
+</ul>
+
+<h3>Final CTA</h3>
+<p>Dark rounded block. "Stop writing cold emails. Start getting replies." Green CTA button.</p>
+
+<h3>CTA Destination</h3>
+<p>All "Book a demo" buttons → Calendly booking page (env var).</p>
+
+<!-- ════════════════════════════════════ -->
+<h2>2. App Redesign</h2>
+<p>Same design system as landing page. Replaces the brutalist/Courier Prime aesthetic entirely.</p>
+
+<h3>Screen 1: Agent Selection <code>/agents</code></h3>
+<p><strong>Heading:</strong> "Who do you want working for you?"</p>
+<p><strong>4 cards in one row:</strong></p>
+<div class="card">
+  <p style="margin-bottom: 8px;"><strong>Sally</strong> · 25, Marketing Creative<br><span style="color:#666;">Casual, energetic, fresh. Startups & creative industries.</span><br><span class="badge badge-green">casual & energetic</span></p>
+  <p style="margin-bottom: 8px;"><strong>David</strong> · 35, SDR Veteran<br><span style="color:#666;">Polished, professional, strategic. B2B & enterprise.</span><br><span class="badge badge-green">corporate & polished</span></p>
+  <p style="margin-bottom: 8px;"><strong>Jessica</strong> · 47, Communications Expert<br><span style="color:#666;">Direct, real, efficient. No fluff.</span><br><span class="badge badge-green">direct & no-nonsense</span></p>
+  <p style="margin-bottom: 0;"><strong>Hans</strong> · Friendly Realist<br><span style="color:#666;">Warm, honest, real. Cold outreach that feels genuine.</span><br><span class="badge badge-green">friendly & real</span></p>
+</div>
+<p><strong>Below, centered:</strong> "Build Your Own" — dashed border card. Train a custom agent on your voice.</p>
+<p>Realistic avatar photos, not emoji. Click to select (green border + checkmark). "Continue →" fades in.</p>
+<p>All agents can do all tasks. Selection is purely about style/tone.</p>
+
+<p><strong>Task types</strong> (selected during voice conversation):</p>
+<ol>
+  <li>Research — find and profile prospects</li>
+  <li>Outreach — find, write, send on autopilot</li>
+  <li>Follow-up — re-engage non-repliers</li>
+  <li>Lead nurture — warm leads over time</li>
+  <li>Inbound responder — handle replies, qualify</li>
+</ol>
+
+<h3>Screen 2: Voice Setup <code>/setup</code></h3>
+<p><strong>Heading:</strong> "Talk to {AgentName}"</p>
+<ul>
+  <li>Chat container, white card, 24px radius</li>
+  <li>Agent avatar + name + "● listening" status</li>
+  <li>Mic button (green, 48px) as primary input</li>
+  <li>Text input as fallback</li>
+  <li>Speech-to-text via Web Speech API or third-party</li>
+  <li>Agent personality shapes the conversation</li>
+  <li>Auto-transitions to plan when enough info gathered</li>
+</ul>
+
+<h3>Screen 3: Your Plan <code>/plan</code></h3>
+<p><strong>Heading:</strong> "Here's what {AgentName} put together."</p>
+<p>Three stacked cards, all tap-to-edit:</p>
+<ul>
+  <li><strong>Your Business</strong> — editable summary</li>
+  <li><strong>Ideal Customer</strong> — colored ICP tags (green: titles, tan: company, purple: industry)</li>
+  <li><strong>The Plan</strong> — adjustable knobs: emails/day (slider), sending window (slider)</li>
+</ul>
+<p>CTA: "Looks good — show me examples →"</p>
+
+<h3>Screen 4: Email Preview <code>/preview</code></h3>
+<p><strong>Heading:</strong> "Here's what {AgentName} would send."</p>
+<ul>
+  <li>2-3 sample emails with real prospect names</li>
+  <li>Each shows: name, company, research trigger tag, subject, body</li>
+  <li>Edit / "Looks good" buttons per email</li>
+  <li>Edits feed back into voice profile learning</li>
+</ul>
+<p>CTA: "Launch {AgentName} →"</p>
+
+<h3>Screen 5: Dashboard <code>/dashboard</code></h3>
+<ul>
+  <li><strong>Agent status bar</strong> — avatar, "{AgentName} is working", pulse indicator</li>
+  <li><strong>Stats</strong> — 3 cards: sent today, total sent, replies (green highlight)</li>
+  <li><strong>Actions</strong> — Run now, Pause, Review queue</li>
+  <li><strong>Notifications</strong> — reply alerts (green), review needed (tan), status updates (grey)</li>
+  <li>Auto-polls every 10 seconds</li>
+</ul>
+
+<h3>Review Queue <code>/review</code></h3>
+<p>Reskin of existing page with new design tokens. No layout changes.</p>
+
+<!-- ════════════════════════════════════ -->
+<h2>3. Email Copy Rules</h2>
+<p>These govern all AI agents. Non-negotiable. Agent personality adds flavor on top.</p>
+
+<div class="rule">
+  <div class="rule-label">Subject Lines</div>
+  <p style="margin:0;">Lowercase, 3-5 words, looks like a friend typed it. No clickbait.</p>
+</div>
+
+<div class="rule">
+  <div class="rule-label">Opening</div>
+  <p style="margin:0;">Lead with something about them. The research trigger IS the opener.</p>
+</div>
+
+<div class="rule">
+  <div class="rule-label">Body</div>
+  <p style="margin:0;">3-5 sentences. 3rd-5th grade reading level (exception: academic targets). One idea, one ask. No hyphens or em dashes ever. No bullet points.</p>
+</div>
+
+<div class="rule">
+  <div class="rule-label">CTA</div>
+  <p style="margin:0;">Soft ask only. One CTA. Include an easy out.</p>
+</div>
+
+<div class="rule">
+  <div class="rule-label">Tone</div>
+  <p style="margin:0;">Match agent personality. Max 1 exclamation mark. No fake urgency. No name-dropping.</p>
+</div>
+
+<div class="rule">
+  <div class="rule-label">Follow-ups</div>
+  <p style="margin:0;">1 light bump, 2 max. Short, casual. Each shorter than the last. No guilt tripping.</p>
+</div>
+
+<h3>Banned Words</h3>
+<div class="banned">
+  <code>leverage</code> <code>synergy</code> <code>utilize</code> <code>reach out</code> <code>touch base</code> <code>I'd love to</code> <code>I'm sure you're busy</code> <code>Just checking in</code>
+</div>
+
+<h3>Hard Rules (Never Break)</h3>
+<ul>
+  <li>Never fabricate research</li>
+  <li>Never pretend to know them</li>
+  <li>Never weaponize pain points</li>
+  <li>Never send without a real research trigger — skip instead</li>
+  <li>No spammy unsubscribe footers</li>
+</ul>
+
+<h3>Agent Modifiers</h3>
+<div class="card">
+  <p style="margin-bottom: 6px;"><strong>Sally:</strong> Casual, might use one emoji, conversational closers</p>
+  <p style="margin-bottom: 6px;"><strong>David:</strong> Structured, industry-aware, confident</p>
+  <p style="margin-bottom: 6px;"><strong>Jessica:</strong> Extremely concise, no filler, direct ask</p>
+  <p style="margin-bottom: 6px;"><strong>Hans:</strong> Warm, personal, references something relatable</p>
+  <p style="margin: 0;"><strong>Custom:</strong> Matches extracted voice profile</p>
+</div>
+
+<hr>
+<p style="font-size: 12px; color: #999; text-align: center; margin-top: 24px;">NIO Design Spec · May 31, 2026</p>
+
+</div>
+</body>
+</html>
